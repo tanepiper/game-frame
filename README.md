@@ -183,14 +183,15 @@ to produce, and the pitfalls that cost time.
 | [re-port](skills/re-port/SKILL.md) | Reimplement exactly: precision, order of operations, draw order, iteration order; an exact core with commands, digests and a headless runner; additions (multiplayer, mods) kept apart |
 | [re-cleanroom](skills/re-cleanroom/SKILL.md) | Write a neutral behavior contract in a source-visible role, then implement it in a fresh source-blind role |
 | [re-verify](skills/re-verify/SKILL.md) | Bit-exact parity, draw order, determinism with digests and on every platform, recordings, saves, pictures, version against version, test tiers |
-| [re-land](skills/re-land/SKILL.md) | Document in evidence style, label, commit safely |
+| [re-land](skills/re-land/SKILL.md) | Document in evidence style, label, commit owned files, and merge completed slices into `main` |
 | [re-site](skills/re-site/SKILL.md) | The project's website in `sites/`: a diary entry per milestone, the documents shown as pages with `@include`, no commit dumps and no game material |
 
 ## Stage agents
 
 One agent per stage of the method, in [agents/](agents/). Each has its skills preloaded, does only its
 stage and ends with a hand-off that names the next agent. The main session sends them one at a
-time; only the lander commits. `re-start` ("Stage agents") has the table of hand-offs.
+time; only the lander commits and integrates completed slices into `main`. `re-start` ("Stage
+agents") has the table of hand-offs.
 [Permissions and gates](docs/working/gates.md) lists what runs without asking and the hooks
 that block game material, decompiled code and commits by other agents.
 

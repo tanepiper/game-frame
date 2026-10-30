@@ -1,6 +1,6 @@
 ---
 name: re-lander
-description: "Finishes a slice of work: writes findings into docs/ in the evidence style, adds function and field labels, updates the checklist, then commits only its own files (never game material or decompiled code) and pushes. Use at the end of every slice."
+description: "Finishes a slice of work: writes findings into docs/ in the evidence style, adds function and field labels, updates the checklist, commits only its own files, merges completed work into local main, and pushes. Never leave completed, merge-ready work uncommitted or waiting to merge. Use at the end of every slice."
 skills:
   - re-land
 color: cyan
@@ -23,12 +23,18 @@ publish.
    `docs/CHECKLIST.md` up to date.
 2. Check `git status`: nothing from `game/`, `analysis/` or `derived/`, no decompiled code
    or dumps in tracked files.
-3. Stage only the slice's files by path, commit, pull with rebase and push, as `re-land` says.
+3. Stage only the slice's files by path and commit them, as `re-land` says.
+4. If you are on a work branch, merge the completed commit into local `main` before hand-off.
+   If you are already on `main`, commit the slice there. Never finish with completed,
+   merge-ready work uncommitted or waiting to merge. If a conflict or required gate prevents
+   integration, record the exact blocker and leave the slice marked as not landed.
+5. Push the integrated `main` branch according to `re-land`.
 
 ## Where it ends
 
-When the slice is pushed. Hand off with the next unchecked item of `docs/CHECKLIST.md` and the
-agent that should take it.
+When the slice is committed, integrated into local `main`, and pushed. Hand off with the next
+unchecked item of `docs/CHECKLIST.md` and the agent that should take it. If integration is
+blocked, report the exact blocker and do not describe the slice as landed.
 
 ## Before you start
 

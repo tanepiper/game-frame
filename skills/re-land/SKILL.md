@@ -1,9 +1,9 @@
 ---
 name: re-land
-description: Finish a slice of reverse-engineering work - write findings into docs/ in the evidence style, add function and field labels, update the checklist, then commit only your own files (never game material or decompiled code) and push, safely alongside other sessions. Use at the end of every trace, format, emulate, port or verify slice.
+description: Finish a reverse-engineering slice by documenting evidence, updating labels and the checklist, then committing only your own files, merging completed work into local main, and pushing. Never leave completed, merge-ready work uncommitted or waiting to merge.
 ---
 
-# Document, label, commit
+# Document, label, commit and merge
 
 Undocumented findings are re-derived by the next session, at full cost. Landing is part of the
 work.
@@ -96,17 +96,25 @@ Other sessions may edit the repository at the same time:
 - **Processes left running.** Games, servers and emulators started for a test keep running
   after it fails. Stop them before you finish. Give long runs a time limit.
 
-## 4. Commit and push
+## 4. Commit, merge and push
 
 A subject in the imperative, at most 72 characters (`Trace the citizen job choice`), and a body
 that says what was traced, measured or reimplemented and how it was checked. Then:
 
 ```bash
-git show --stat HEAD                  # only your files?
-git pull --rebase && git push
+git status --short                    # check for your own unfinished changes
+git show --stat HEAD                  # confirm only your slice landed
 ```
 
-If the rebase conflicts in files you did not touch, stop and report.
+Commit only the files or hunks from your slice. If you worked on a branch or in a worktree,
+merge that commit into the local `main` branch before hand-off. If you started on `main`, the
+commit is already integrated. Never leave completed, merge-ready work uncommitted or waiting in
+a branch to be merged. If a conflict or required gate prevents integration, record the exact
+blocker in the hand-off and mark the slice as not landed.
+
+After integration, update local `main` from its remote and push it, following the project's
+workflow. If the rebase or push conflicts in files you did not touch, stop and report the exact
+blocker; do not rewrite or stage another session's work.
 
 ## 5. Ship
 

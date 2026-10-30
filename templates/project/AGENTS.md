@@ -79,7 +79,12 @@ user may change any of them.
    fields into `labels/fields.tsv`, the meaning, unit and range of each value into
    `labels/dictionary.tsv`, progress into `docs/CHECKLIST.md`. An undocumented finding
    is re-derived by the next session.
-7. **Several sessions may work at once.** Stage only your own files (`git add path`), never `git add -A`. Never revert work you did not do.
+7. **Several sessions may work at once.** Stage only your own files (`git add path`), never
+   `git add -A`. Never revert work you did not do. Before ending, commit each completed slice
+   that has passed its gates and integrate it into local `main`. Do not leave completed,
+   merge-ready work uncommitted or waiting in a branch or worktree. If a gate or conflict blocks
+   integration, record the exact blocker and keep the slice marked as not landed. Do not stage
+   another session's work to make the tree clean.
 8. **Ask before downloading** anything; say the file, the source and the size.
 9. **Licence and instructions.** Our code is Apache 2.0 (LICENSE-APACHE; `license =
    "Apache-2.0"` in manifests); documentation and other prose are CC0 1.0,

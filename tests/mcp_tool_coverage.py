@@ -82,11 +82,11 @@ def test_catalog_and_runner():
     expected = [item.as_dict() for item in items]
     runnable = [item for item in items if item.runs]
     nonrunnable = [item for item in items if not item.runs]
-    assert len(items) == 131, f'catalog has {len(items)} items; update the expected count'
+    assert len(items) == 132, f'catalog has {len(items)} items; update the expected count'
     assert len(runnable) == 103, f'catalog has {len(runnable)} runnable items; update the expected count'
     assert any(item.name == 'ps2_emu' and item.runs for item in items)
     assert any(item.name == 'ps2_sif0' and item.runs for item in items)
-    assert len([item for item in items if item.kind == 'library']) == 19
+    assert len([item for item in items if item.kind == 'library']) == 20
     assert len([item for item in items if item.kind == 'ghidra']) == 9
 
     with tempfile.TemporaryDirectory(prefix='gameframe-mcp-coverage-') as project:
@@ -199,7 +199,7 @@ def test_progress_cancellation_and_timeout():
 def main():
     test_catalog_and_runner()
     test_progress_cancellation_and_timeout()
-    print('MCP coverage: 131 catalog entries, 103 runnable tools, progress/cancel/timeout')
+    print('MCP coverage: 132 catalog entries, 103 runnable tools, progress/cancel/timeout')
 
 
 if __name__ == '__main__':

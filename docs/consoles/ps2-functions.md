@@ -167,6 +167,36 @@ source path was modeled; it does not mean that a hardware transfer or the
 rest of the emulator completed. Synthetic checks are regressions for the
 documented model, not gameplay evidence.
 
+### IOP timer-5 COUNT read
+
+`tools/emu/ps2_iop_timer.py` provides `read_timer5_count(state,
+committed_cycle)`. It returns the low 32 bits of the timer count and a new
+immutable `Timer5State`. The caller supplies the timer's current count, start
+cycle, rate, complete mode word, current repeat/toggle behavior, and whether a
+timer event needs processing. Inputs are validated before an updated state is
+returned; unsupported calls raise `Unsupported` and leave the supplied state
+unchanged.
+
+This is a source-qualified arithmetic model of the simple timer-5 path in
+PCSX2 v2.8.2, revision
+`fd9d310ccbb6b8b62c976da8886a3c8fd3a10ff3`, chiefly
+`pcsx2/IopCounters.cpp` functions `psxRcntSync` and `psxRcntRcount32`, with the
+mode fields defined in `pcsx2/IopCounters.h`. It supports a running timer with
+rate 1, prescale bits selecting rate 1, gate disabled, nondecreasing committed
+cycle, and no due timer event. Elapsed cycles are first narrowed to unsigned
+32 bits, then added to the unsigned 64-bit count and start cycle. The returned
+count is narrowed to unsigned 32 bits. In repeat/pulsed mode the interrupt
+enable bit is set even when the narrowed elapsed change is zero; other mode
+bits and the remaining modeled fields are preserved.
+
+The caller's `event_due=False` is an explicit precondition, not a scheduler
+calculation. This helper does not determine whether an event is due, process
+timer interrupts, emulate other rates or gate modes, update next-event timing,
+or model the IOP timer device. The behavior is independently implemented; no
+PCSX2 source is included. Synthetic boundary tests run by `tests/run.sh` and
+directly with `python3 tests/test_ps2_iop_timer.py` are arithmetic regressions,
+not evidence of gameplay behavior.
+
 ### Integer execution backend
 
 `ps2_emu.py` loads little-endian ELF32 MIPS executable segments into 32 MiB of RAM.

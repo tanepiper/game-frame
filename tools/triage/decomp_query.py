@@ -24,7 +24,9 @@ read. A file of labels for this binary alone, labels/<binary name>.tsv in the cu
 read first (for overlays and DLLs whose addresses overlap). The labels are then read from each
 --labels FILE (the first file to name an address wins), else from labels/names.tsv in the current folder
 (the project you work in), else from the project's, else from GameFrame's own. `--binary` picks a
-binary when the export holds several (default: the only one, or the first .exe).
+binary when the export holds several. The default is the only one, or else the .exe with the most
+functions, so a game wins over its small launcher; a note on stderr names the choice. An address
+must fall inside a function of that binary, or the query stops and names the other binaries.
 
 `--export` defaults to analysis/export in the project: the folder GAMEFRAME_PROJECT names (a
 project's `./gameframe` sets it), else GameFrame's own folder.
@@ -56,16 +58,29 @@ def fun_addr(m):
     return int(m.group(1), 16)
 
 
+def function_count(export_dir, binary):
+    """How many functions a binary's export lists, 0 when it has no functions.tsv."""
+    path = os.path.join(export_dir, binary, 'functions.tsv')
+    if not os.path.exists(path):
+        return 0
+    with open(path, 'rb') as f:
+        return sum(1 for _ in f)
+
+
 class Export:
     def __init__(self, export_dir, binary=None, labels_file=None):
         names = sorted(os.listdir(export_dir)) if os.path.isdir(export_dir) else []
         if not names:
             sys.exit(f'no export in {export_dir}: run scripts/ghidra-export.sh first')
         if binary is None:
-            exes = [n for n in names if n.lower().endswith('.exe')]
-            binary = names[0] if len(names) == 1 else (exes or names)[0]
+            exes = [n for n in names if n.lower().endswith('.exe')] or names
+            binary = max(exes, key=lambda n: function_count(export_dir, n))
+            if len(exes) > 1:
+                print(f'// {binary}, the largest of {", ".join(exes)}: --binary picks another',
+                      file=sys.stderr)
         self.dir = os.path.join(export_dir, binary)
         self.binary = binary
+        self.others = [n for n in names if n != binary]
         own = os.path.join(os.getcwd(), 'labels', os.path.splitext(binary)[0] + '.tsv')
         self.labels = load_one(own) if os.path.exists(own) else {}
         self.labels.update({a: n for a, n in load_labels(labels_file).items() if a not in self.labels})
@@ -109,7 +124,7 @@ class Export:
             if addr in self.functions:
                 return addr
             starts = [a for a in self.functions if a <= addr]
-            if starts:
+            if starts and addr < max(starts) + self.functions[max(starts)][1]:
                 return max(starts)  # an address inside a function
         for addr, label in self.labels.items():
             if label == text:
@@ -117,7 +132,8 @@ class Export:
         for addr, (name, _) in self.functions.items():
             if name == text or name.endswith('::' + text):
                 return addr
-        sys.exit(f'{text}: no such function')
+        others = f' (others: {", ".join(self.others)}; --binary picks one)' if self.others else ''
+        sys.exit(f'{text}: no such function in {self.binary}{others}')
 
     def refs(self, addr):
         """The spellings by which pseudocode refers to a function."""

@@ -1285,6 +1285,11 @@ expect "decomp_query layout merges a structure's fields" "0x18     4  int       
 expect "decomp_query layout scales indexes of an int pointer" "    int                      f_1c;  /* also read as char */" "$PYTHON" tools/triage/decomp_query.py --export tests/fixtures/export-layout layout FUN_140001000 FUN_140001100
 P="$(mktemp -d)"; mkdir -p "$P/analysis/export" && cp -R tests/fixtures/export-layout/GAME.EXE "$P/analysis/export/"
 expect "gameframe run decomp_query reads the project's export by default (GAMEFRAME_PROJECT)" "GAME.EXE: 2 functions" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query stats
+mkdir -p "$P/analysis/export/AAA.EXE"; printf '00401000\t16\tstart\n' > "$P/analysis/export/AAA.EXE/functions.tsv"; : > "$P/analysis/export/AAA.EXE/decomp.c"
+expect "decomp_query defaults to the largest .exe, not the first" "GAME.EXE: 2 functions" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query stats
+expect "decomp_query names the binary it chose" "the largest of AAA.EXE, GAME.EXE" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query stats
+expect "decomp_query refuses an address past every function" "0x48fef4: no such function in AAA.EXE (others: GAME.EXE" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query --binary AAA.EXE fn 0x48fef4
+expect "decomp_query still finds an address inside a function" "start (16 bytes) in AAA.EXE" env GAMEFRAME_PROJECT="$P" ./gameframe run decomp_query --binary AAA.EXE fn 0x401008
 rm -rf "$P"
 expect "shaders finds a Direct3D 9 pixel shader and its constant" "FogColor" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"
 expect "shaders reads a DXBC container's stage and version" "DXBC pixel 4.0 [RDEF SHDR]" "$PYTHON" tools/formats/shaders.py "$W/shaders.bin"

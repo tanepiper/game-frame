@@ -189,6 +189,10 @@ Every release of GameFrame, newest first. The format follows
 
 ### Fixed
 
+- `decomp_query` picks the .exe with the most functions when an export holds several, not the first
+  by name, and says on stderr which it chose. A game no longer loses to its smaller launcher. An
+  address past the end of every function now stops the query and names the other binaries, where
+  it used to return the nearest function before it.
 - `gameframe-report` panicked in the browser on its first report ("time not implemented on
   this platform"): it stamped reports with `std::time::SystemTime`, which wasm32 lacks. It
   uses `web-time` now, the same clock natively.
